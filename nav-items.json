@@ -1,0 +1,23 @@
+{
+  "app": {
+    "pageTitle": "导航",
+    "brandTitle": "导航",
+    "icon": "N"
+  },
+  "items": [
+    {
+      "id": "baidu",
+      "title": "baidu",
+      "url": "baidu.com",
+      "order": 10,
+      "createdAt": "2026-05-05T00:00:00.000Z"
+    },
+    {
+      "id": "print-server",
+      "title": "print-server",
+      "url": "hostname:3456",
+      "order": 20,
+      "createdAt": "2026-05-05T00:01:00.000Z"
+    }
+  ]
+}

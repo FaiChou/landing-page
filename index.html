@@ -1,0 +1,946 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>导航</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7f9;
+      --panel: #ffffff;
+      --text: #1d2433;
+      --muted: #667085;
+      --line: #d9dee8;
+      --brand: #2563eb;
+      --brand-dark: #1d4ed8;
+      --danger: #dc2626;
+      --danger-bg: #fff1f2;
+      --shadow: 0 16px 40px rgba(20, 30, 55, 0.08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-width: 1024px;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .topbar {
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 40px;
+      background: var(--panel);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 1px 0 rgba(20, 30, 55, 0.02);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      background: #e9f1ff;
+      color: var(--brand);
+      font-weight: 800;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .icon-button,
+    .button {
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--text);
+      cursor: pointer;
+      transition: 0.16s ease;
+    }
+
+    .icon-button {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      padding: 0;
+    }
+
+    .icon-button:hover,
+    .button:hover {
+      border-color: #a9b5c8;
+      background: #f9fafb;
+    }
+
+    .button {
+      height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 8px;
+      padding: 0 14px;
+      font-weight: 600;
+    }
+
+    .button.primary {
+      border-color: var(--brand);
+      background: var(--brand);
+      color: #fff;
+    }
+
+    .button.primary:hover {
+      border-color: var(--brand-dark);
+      background: var(--brand-dark);
+    }
+
+    .button.danger {
+      border-color: #fecdd3;
+      background: var(--danger-bg);
+      color: var(--danger);
+    }
+
+    .wrap {
+      width: min(1180px, calc(100vw - 80px));
+      margin: 34px auto 56px;
+    }
+
+    .page-head {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 22px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    .hint {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .link-card {
+      position: relative;
+      min-height: 98px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+    }
+
+    .link-card:hover {
+      transform: translateY(-2px);
+      border-color: #a9b5c8;
+      box-shadow: 0 18px 46px rgba(20, 30, 55, 0.12);
+    }
+
+    .link-title {
+      padding-right: 34px;
+      overflow-wrap: anywhere;
+      font-size: 17px;
+      font-weight: 700;
+      line-height: 1.25;
+    }
+
+    .link-url {
+      color: var(--muted);
+      font-size: 13px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .favorite-button {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      background: transparent;
+      color: #98a2b3;
+      cursor: pointer;
+      transition: 0.16s ease;
+    }
+
+    .favorite-button:hover {
+      border-color: #fde68a;
+      background: #fffbeb;
+      color: #d97706;
+    }
+
+    .favorite-button.active {
+      color: #f59e0b;
+    }
+
+    .favorite-button svg {
+      fill: none;
+    }
+
+    .favorite-button.active svg {
+      fill: currentColor;
+    }
+
+    .empty {
+      padding: 46px;
+      border: 1px dashed #b8c2d4;
+      border-radius: 8px;
+      background: var(--panel);
+      color: var(--muted);
+      text-align: center;
+    }
+
+    .settings-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 20px;
+      align-items: start;
+    }
+
+    .table-panel,
+    .config-panel,
+    .editor-panel,
+    .notice {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .table-panel {
+      overflow: hidden;
+    }
+
+    .config-panel {
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+
+    .config-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 120px;
+      gap: 14px;
+      align-items: end;
+    }
+
+    .config-grid .field {
+      margin-bottom: 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    th,
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #fbfcfe;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    tr:last-child td {
+      border-bottom: 0;
+    }
+
+    td {
+      font-size: 14px;
+    }
+
+    .cell-order,
+    .cell-title,
+    .cell-url {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
+    .small-icon {
+      width: 34px;
+      height: 34px;
+    }
+
+    .editor-panel {
+      padding: 20px;
+      position: sticky;
+      top: 84px;
+    }
+
+    .editor-panel h2 {
+      margin: 0 0 18px;
+      font-size: 18px;
+      letter-spacing: 0;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      color: #344054;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .field input {
+      height: 40px;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0 12px;
+      outline: none;
+      color: var(--text);
+      background: #fff;
+    }
+
+    .field input:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.13);
+    }
+
+    .editor-actions {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .notice {
+      margin-top: 16px;
+      padding: 14px 16px;
+      color: #475467;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .notice code {
+      padding: 2px 5px;
+      border-radius: 5px;
+      background: #edf2f7;
+      color: #243042;
+    }
+
+    .status {
+      min-height: 20px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .status.error {
+      color: var(--danger);
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" id="brandIcon">N</div>
+      <span id="brandTitle">导航</span>
+    </div>
+    <div class="nav-actions">
+      <button class="button hidden" id="homeButton" type="button">返回首页</button>
+      <button class="icon-button" id="settingsButton" type="button" aria-label="配置" title="配置">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" stroke-width="2"/>
+          <path d="M19.43 12.98c.04-.32.07-.65.07-.98s-.02-.66-.07-.98l2.11-1.65a.5.5 0 0 0 .12-.64l-2-3.46a.5.5 0 0 0-.6-.22l-2.49 1a7.29 7.29 0 0 0-1.69-.98L14.5 2.42A.5.5 0 0 0 14 2h-4a.5.5 0 0 0-.5.42L9.12 5.07c-.61.24-1.18.57-1.69.98l-2.49-1a.5.5 0 0 0-.6.22l-2 3.46a.5.5 0 0 0 .12.64l2.11 1.65c-.04.32-.07.65-.07.98s.02.66.07.98l-2.11 1.65a.5.5 0 0 0-.12.64l2 3.46c.13.22.39.31.6.22l2.49-1c.51.4 1.08.73 1.69.98l.38 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.38-2.65c.61-.24 1.18-.57 1.69-.98l2.49 1c.22.09.48 0 .6-.22l2-3.46a.5.5 0 0 0-.12-.64l-2.11-1.65Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section id="homePage">
+      <div class="page-head">
+        <div>
+          <h1>常用入口</h1>
+          <div class="hint">点击项目会在新页面打开链接。</div>
+        </div>
+      </div>
+      <div class="grid" id="linkGrid"></div>
+      <div class="empty hidden" id="emptyState">还没有导航项目，请进入配置页面添加。</div>
+    </section>
+
+    <section class="hidden" id="settingsPage">
+      <div class="page-head">
+        <div>
+          <h1>配置导航</h1>
+          <div class="hint">保存后写入当前目录的 <code>nav-items.json</code>。</div>
+        </div>
+        <button class="button primary" id="saveButton" type="button">保存 JSON</button>
+      </div>
+
+      <div class="settings-layout">
+        <div>
+          <div class="config-panel">
+            <div class="config-grid">
+              <div class="field">
+                <label for="appTitleInput">页面标题</label>
+                <input id="appTitleInput" type="text" autocomplete="off" placeholder="导航">
+              </div>
+              <div class="field">
+                <label for="brandTitleInput">左上角标题</label>
+                <input id="brandTitleInput" type="text" autocomplete="off" placeholder="导航">
+              </div>
+              <div class="field">
+                <label for="brandIconInput">图标文字</label>
+                <input id="brandIconInput" type="text" autocomplete="off" maxlength="4" placeholder="N">
+              </div>
+            </div>
+          </div>
+          <div class="table-panel">
+            <table>
+              <colgroup>
+                <col style="width: 92px">
+                <col style="width: 30%">
+                <col>
+                <col style="width: 118px">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>序号</th>
+                  <th>标题</th>
+                  <th>链接</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="itemsTable"></tbody>
+            </table>
+          </div>
+          <div class="notice">
+            链接支持 <code>baidu.com</code>、<code>https://example.com</code>、<code>hostname:3456</code>、<code>{{host}}:3456</code>。
+            <code>hostname</code> 会替换成当前访问这个页面时的主机名或 IP。首页会先展示本机收藏，再按序号和创建时间排序。
+          </div>
+          <div class="status" id="statusText"></div>
+        </div>
+
+        <aside class="editor-panel">
+          <h2 id="editorTitle">新建项目</h2>
+          <div class="field">
+            <label for="titleInput">标题</label>
+            <input id="titleInput" type="text" autocomplete="off" placeholder="baidu">
+          </div>
+          <div class="field">
+            <label for="urlInput">链接</label>
+            <input id="urlInput" type="text" autocomplete="off" placeholder="baidu.com 或 hostname:3456">
+          </div>
+          <div class="field">
+            <label for="orderInput">序号</label>
+            <input id="orderInput" type="number" autocomplete="off" placeholder="10" step="1">
+          </div>
+          <div class="editor-actions">
+            <button class="button" id="resetButton" type="button">清空</button>
+            <button class="button primary" id="upsertButton" type="button">添加</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const DATA_FILE = "nav-items.json";
+    const FAVORITES_KEY = "nav-favorites";
+    const HOST_TOKENS = ["hostname", "{{host}}", "{{hostname}}"];
+    const DEFAULT_APP = {
+      pageTitle: "导航",
+      brandTitle: "导航",
+      icon: "N"
+    };
+    const state = {
+      app: { ...DEFAULT_APP },
+      items: [],
+      editingId: null,
+      favorites: new Set()
+    };
+
+    const linkGrid = document.querySelector("#linkGrid");
+    const emptyState = document.querySelector("#emptyState");
+    const brandIcon = document.querySelector("#brandIcon");
+    const brandTitle = document.querySelector("#brandTitle");
+    const settingsButton = document.querySelector("#settingsButton");
+    const homeButton = document.querySelector("#homeButton");
+    const homePage = document.querySelector("#homePage");
+    const settingsPage = document.querySelector("#settingsPage");
+    const saveButton = document.querySelector("#saveButton");
+    const itemsTable = document.querySelector("#itemsTable");
+    const appTitleInput = document.querySelector("#appTitleInput");
+    const brandTitleInput = document.querySelector("#brandTitleInput");
+    const brandIconInput = document.querySelector("#brandIconInput");
+    const titleInput = document.querySelector("#titleInput");
+    const urlInput = document.querySelector("#urlInput");
+    const orderInput = document.querySelector("#orderInput");
+    const upsertButton = document.querySelector("#upsertButton");
+    const resetButton = document.querySelector("#resetButton");
+    const editorTitle = document.querySelector("#editorTitle");
+    const statusText = document.querySelector("#statusText");
+
+    function uid() {
+      return crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random());
+    }
+
+    function safeText(value, fallback) {
+      const text = String(value || "").trim();
+      return text || fallback;
+    }
+
+    function normalizeApp(raw) {
+      const source = raw && typeof raw === "object" ? raw : {};
+      return {
+        pageTitle: safeText(source.pageTitle, DEFAULT_APP.pageTitle),
+        brandTitle: safeText(source.brandTitle, DEFAULT_APP.brandTitle),
+        icon: safeText(source.icon, DEFAULT_APP.icon).slice(0, 4)
+      };
+    }
+
+    function escapeXml(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function setFavicon(iconText) {
+      const oldIcon = document.querySelector("link[rel='icon']");
+      if (oldIcon) oldIcon.remove();
+
+      const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><rect width="64" height="64" rx="14" fill="#2563eb"/><text x="50%" y="53%" text-anchor="middle" dominant-baseline="middle" fill="white" font-family="Arial, sans-serif" font-size="30" font-weight="700">${escapeXml(iconText)}</text></svg>`;
+      const link = document.createElement("link");
+      link.rel = "icon";
+      link.type = "image/svg+xml";
+      link.href = `data:image/svg+xml,${encodeURIComponent(svg)}`;
+      document.head.append(link);
+    }
+
+    function applyAppConfig(updateInputs = true) {
+      document.title = state.app.pageTitle;
+      brandTitle.textContent = state.app.brandTitle;
+      brandIcon.textContent = state.app.icon;
+      if (updateInputs) {
+        appTitleInput.value = state.app.pageTitle;
+        brandTitleInput.value = state.app.brandTitle;
+        brandIconInput.value = state.app.icon;
+      }
+      setFavicon(state.app.icon);
+    }
+
+    function collectAppConfig() {
+      state.app = normalizeApp({
+        pageTitle: appTitleInput.value,
+        brandTitle: brandTitleInput.value,
+        icon: brandIconInput.value
+      });
+      applyAppConfig(false);
+    }
+
+    function createdAtFallback(index) {
+      return `1970-01-01T00:00:${String(index).padStart(2, "0")}Z`;
+    }
+
+    function parseOrder(value, fallback) {
+      const parsed = Number(value);
+      return Number.isFinite(parsed) ? parsed : fallback;
+    }
+
+    function nextOrder() {
+      if (!state.items.length) return 10;
+      return Math.max(...state.items.map((item) => parseOrder(item.order, 0))) + 10;
+    }
+
+    function loadFavorites() {
+      try {
+        state.favorites = new Set(JSON.parse(localStorage.getItem(FAVORITES_KEY) || "[]"));
+      } catch (error) {
+        state.favorites = new Set();
+      }
+    }
+
+    function saveFavorites() {
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify([...state.favorites]));
+    }
+
+    function isFavorite(id) {
+      return state.favorites.has(id);
+    }
+
+    function toggleFavorite(id) {
+      if (isFavorite(id)) {
+        state.favorites.delete(id);
+      } else {
+        state.favorites.add(id);
+      }
+      saveFavorites();
+      renderAll();
+    }
+
+    function sortedItems(options = {}) {
+      const includeFavorites = options.includeFavorites !== false;
+      return [...state.items].sort((a, b) => {
+        if (includeFavorites) {
+          const favoriteDiff = Number(isFavorite(b.id)) - Number(isFavorite(a.id));
+          if (favoriteDiff) return favoriteDiff;
+        }
+
+        const orderDiff = parseOrder(a.order, 0) - parseOrder(b.order, 0);
+        if (orderDiff) return orderDiff;
+
+        return String(a.createdAt).localeCompare(String(b.createdAt));
+      });
+    }
+
+    function normalizeItems(raw) {
+      if (!Array.isArray(raw)) return [];
+      return raw
+        .filter((item) => item && typeof item.title === "string" && typeof item.url === "string")
+        .map((item, index) => ({
+          id: item.id || uid(),
+          title: item.title.trim(),
+          url: item.url.trim(),
+          order: parseOrder(item.order, (index + 1) * 10),
+          createdAt: item.createdAt || createdAtFallback(index)
+        }))
+        .filter((item) => item.title && item.url);
+    }
+
+    function normalizeData(raw) {
+      if (Array.isArray(raw)) {
+        return {
+          app: { ...DEFAULT_APP },
+          items: normalizeItems(raw)
+        };
+      }
+
+      return {
+        app: normalizeApp(raw && raw.app),
+        items: normalizeItems(raw && raw.items)
+      };
+    }
+
+    async function loadItems() {
+      loadFavorites();
+      try {
+        const response = await fetch(`${DATA_FILE}?t=${Date.now()}`, { cache: "no-store" });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = normalizeData(await response.json());
+        state.app = data.app;
+        state.items = data.items;
+        setStatus("");
+      } catch (error) {
+        state.app = { ...DEFAULT_APP };
+        state.items = [];
+        setStatus(`没有读取到 ${DATA_FILE}，会从空列表开始。`, false);
+      }
+      applyAppConfig();
+      renderAll();
+      if (!state.editingId) orderInput.value = nextOrder();
+    }
+
+    function resolveUrl(url) {
+      const value = url.trim();
+      if (/^[a-z][a-z0-9+.-]*:\/\//i.test(value)) return value;
+      if (value.startsWith("hostname:")) {
+        return `${location.protocol}//${location.hostname}${value.slice("hostname".length)}`;
+      }
+
+      let replaced = value;
+      for (const token of HOST_TOKENS) {
+        replaced = replaced.split(token).join(location.hostname);
+      }
+
+      if (/^(localhost|127\.0\.0\.1|\[?::1\]?)(:\d+)?(\/.*)?$/i.test(replaced)) {
+        return `${location.protocol}//${replaced}`;
+      }
+
+      if (replaced === location.hostname || replaced.startsWith(`${location.hostname}:`)) {
+        return `${location.protocol}//${replaced}`;
+      }
+
+      return `https://${replaced}`;
+    }
+
+    function displayUrl(url) {
+      return resolveUrl(url).replace(/^https?:\/\//, "");
+    }
+
+    function renderHome() {
+      linkGrid.innerHTML = "";
+      emptyState.classList.toggle("hidden", state.items.length > 0);
+
+      for (const item of sortedItems()) {
+        const card = document.createElement("article");
+        card.className = "link-card";
+        card.tabIndex = 0;
+        card.setAttribute("role", "link");
+        card.setAttribute("aria-label", item.title);
+        card.innerHTML = `
+          <button class="favorite-button" type="button" aria-label="收藏" title="收藏">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m12 2 3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="link-title"></div>
+          <div class="link-url"></div>
+        `;
+        const favoriteButton = card.querySelector(".favorite-button");
+        favoriteButton.classList.toggle("active", isFavorite(item.id));
+        favoriteButton.setAttribute("aria-label", isFavorite(item.id) ? "取消收藏" : "收藏");
+        favoriteButton.title = isFavorite(item.id) ? "取消收藏" : "收藏";
+        favoriteButton.addEventListener("click", (event) => {
+          event.stopPropagation();
+          toggleFavorite(item.id);
+        });
+        card.addEventListener("click", () => window.open(resolveUrl(item.url), "_blank", "noopener,noreferrer"));
+        card.addEventListener("keydown", (event) => {
+          if (event.target === card && event.key === "Enter") {
+            window.open(resolveUrl(item.url), "_blank", "noopener,noreferrer");
+          }
+        });
+        card.querySelector(".link-title").textContent = item.title;
+        card.querySelector(".link-url").textContent = displayUrl(item.url);
+        linkGrid.append(card);
+      }
+    }
+
+    function renderTable() {
+      itemsTable.innerHTML = "";
+      if (!state.items.length) {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td colspan="4" style="color: var(--muted);">暂无项目</td>`;
+        itemsTable.append(row);
+        return;
+      }
+
+      for (const item of sortedItems({ includeFavorites: false })) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td><div class="cell-order"></div></td>
+          <td><div class="cell-title"></div></td>
+          <td><div class="cell-url"></div></td>
+          <td>
+            <div class="row-actions">
+              <button class="icon-button small-icon" type="button" data-action="edit" title="编辑" aria-label="编辑">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M12 20h9" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <button class="icon-button small-icon" type="button" data-action="delete" title="删除" aria-label="删除">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path d="M3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                  <path d="M8 6V4h8v2" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                  <path d="M6 6l1 15h10l1-15" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </td>
+        `;
+        row.querySelector(".cell-order").textContent = item.order;
+        row.querySelector(".cell-title").textContent = item.title;
+        row.querySelector(".cell-url").textContent = item.url;
+        row.querySelector("[data-action='edit']").addEventListener("click", () => editItem(item.id));
+        row.querySelector("[data-action='delete']").addEventListener("click", () => deleteItem(item.id));
+        itemsTable.append(row);
+      }
+    }
+
+    function renderAll() {
+      renderHome();
+      renderTable();
+    }
+
+    function showSettings() {
+      if (location.hash !== "#settings") {
+        location.hash = "#settings";
+      }
+      applyRoute();
+    }
+
+    function showHome() {
+      history.pushState("", document.title, location.pathname + location.search);
+      applyRoute();
+    }
+
+    function applyRoute() {
+      const isSettings = location.hash === "#settings";
+      homePage.classList.toggle("hidden", isSettings);
+      settingsPage.classList.toggle("hidden", !isSettings);
+      homeButton.classList.toggle("hidden", !isSettings);
+      settingsButton.classList.toggle("hidden", isSettings);
+    }
+
+    function resetEditor() {
+      state.editingId = null;
+      titleInput.value = "";
+      urlInput.value = "";
+      orderInput.value = nextOrder();
+      editorTitle.textContent = "新建项目";
+      upsertButton.textContent = "添加";
+      titleInput.focus();
+    }
+
+    function editItem(id) {
+      const item = state.items.find((entry) => entry.id === id);
+      if (!item) return;
+      state.editingId = id;
+      titleInput.value = item.title;
+      urlInput.value = item.url;
+      orderInput.value = item.order;
+      editorTitle.textContent = "修改项目";
+      upsertButton.textContent = "更新";
+      titleInput.focus();
+    }
+
+    function deleteItem(id) {
+      const item = state.items.find((entry) => entry.id === id);
+      if (!item || !confirm(`删除「${item.title}」？`)) return;
+      state.items = state.items.filter((entry) => entry.id !== id);
+      if (state.editingId === id) resetEditor();
+      renderAll();
+      setStatus("已删除，记得保存 JSON。");
+    }
+
+    function upsertItem() {
+      const title = titleInput.value.trim();
+      const url = urlInput.value.trim();
+      const order = parseOrder(orderInput.value, nextOrder());
+      if (!title || !url) {
+        setStatus("标题和链接都需要填写。", true);
+        return;
+      }
+
+      if (state.editingId) {
+        state.items = state.items.map((item) => item.id === state.editingId ? { ...item, title, url, order } : item);
+        setStatus("已更新，记得保存 JSON。");
+      } else {
+        state.items.push({ id: uid(), title, url, order, createdAt: new Date().toISOString() });
+        setStatus("已添加，记得保存 JSON。");
+      }
+      resetEditor();
+      renderAll();
+    }
+
+    function setStatus(message, isError = false) {
+      statusText.textContent = message;
+      statusText.classList.toggle("error", isError);
+    }
+
+    function jsonPayload() {
+      collectAppConfig();
+      return JSON.stringify({
+        app: state.app,
+        items: sortedItems({ includeFavorites: false }).map(({ id, title, url, order, createdAt }) => ({ id, title, url, order, createdAt }))
+      }, null, 2) + "\n";
+    }
+
+    function downloadJson() {
+      const blob = new Blob([jsonPayload()], { type: "application/json" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = DATA_FILE;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    async function saveItems() {
+      setStatus("正在保存...");
+      try {
+        const response = await fetch(DATA_FILE, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: jsonPayload()
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        setStatus(`已保存到 ${DATA_FILE}。`);
+      } catch (error) {
+        downloadJson();
+        setStatus(`当前 nginx 未开放 PUT 写入，已改为下载 ${DATA_FILE}。把它放回 html 同目录即可。`, true);
+      }
+    }
+
+    settingsButton.addEventListener("click", showSettings);
+    homeButton.addEventListener("click", showHome);
+    saveButton.addEventListener("click", saveItems);
+    appTitleInput.addEventListener("input", collectAppConfig);
+    brandTitleInput.addEventListener("input", collectAppConfig);
+    brandIconInput.addEventListener("input", collectAppConfig);
+    upsertButton.addEventListener("click", upsertItem);
+    resetButton.addEventListener("click", resetEditor);
+    window.addEventListener("hashchange", applyRoute);
+
+    loadItems();
+    applyRoute();
+  </script>
+</body>
+</html>
