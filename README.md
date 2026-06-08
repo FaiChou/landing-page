@@ -32,6 +32,8 @@
 - `https://example.com` 会按原样打开
 - `hostname:3456` 会把 `hostname` 替换成当前访问页面的主机名或 IP
 - `{{host}}:3456` 和 `{{hostname}}:3456` 也支持
+- `http://{{host}}/xxx`、`http://{{hostname}}/xxx`、`http://{{host}}:3456/xxx` 会先替换主机名再打开
+- `http://{{hostname}/xxx` 这种少一个右花括号的写法也会兼容解析
 
 ## nginx 保存配置
 

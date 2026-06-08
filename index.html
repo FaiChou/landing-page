@@ -546,7 +546,7 @@
             <button class="button primary" id="saveButton" type="button" disabled>保存 JSON</button>
             <div class="status" id="statusText"></div>
             <div class="notice">
-              链接支持 <code>baidu.com</code>、<code>https://example.com</code>、<code>hostname:3456</code>、<code>{{host}}:3456</code>。
+              链接支持 <code>baidu.com</code>、<code>https://example.com</code>、<code>hostname:3456</code>、<code>{{host}}:3456</code>、<code>http://{{host}}/xxx</code>、<code>http://{{host}}:3456/xxx</code>。
               <code>hostname</code> 会替换成当前访问这个页面时的主机名或 IP。首页会先展示本机收藏，再按序号和创建时间排序。
             </div>
           </div>
@@ -558,7 +558,7 @@
   <script>
     const DATA_FILE = "nav-items.json";
     const FAVORITES_KEY = "nav-favorites";
-    const HOST_TOKENS = ["hostname", "{{host}}", "{{hostname}}"];
+    const HOST_TOKEN_PATTERN = /\{\{host\}\}|\{\{hostname\}\}?|(^|:\/\/)hostname(?=[:/]|$)/gi;
     const DEFAULT_APP = {
       pageTitle: "导航",
       brandTitle: "导航",
@@ -766,19 +766,13 @@
 
     function resolveUrl(url) {
       const value = url.trim();
-      if (/^[a-z][a-z0-9+.-]*:\/\//i.test(value)) return value;
-      if (value.startsWith("hostname:")) {
-        return `${location.protocol}//${location.hostname}${value.slice("hostname".length)}`;
-      }
-
-      let replaced = value;
-      for (const token of HOST_TOKENS) {
-        replaced = replaced.split(token).join(location.hostname);
-      }
+      const replaced = value.replace(HOST_TOKEN_PATTERN, (match, prefix = "") => `${prefix}${location.hostname}`);
 
       if (/^(localhost|127\.0\.0\.1|\[?::1\]?)(:\d+)?(\/.*)?$/i.test(replaced)) {
         return `${location.protocol}//${replaced}`;
       }
+
+      if (/^[a-z][a-z0-9+.-]*:\/\//i.test(replaced)) return replaced;
 
       if (replaced === location.hostname || replaced.startsWith(`${location.hostname}:`)) {
         return `${location.protocol}//${replaced}`;
