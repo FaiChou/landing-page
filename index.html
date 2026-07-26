@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>导航</title>
+  <title>导航页</title>
   <style>
     :root {
       color-scheme: light;
@@ -26,7 +26,6 @@
 
     body {
       margin: 0;
-      min-width: 1024px;
       min-height: 100vh;
       background: var(--bg);
       color: var(--text);
@@ -52,8 +51,32 @@
       display: flex;
       align-items: center;
       gap: 12px;
+      min-width: 0;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: inherit;
       font-size: 18px;
       font-weight: 700;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .brand:hover #brandTitle {
+      color: var(--brand);
+    }
+
+    .brand:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, 0.2);
+      outline-offset: 5px;
+      border-radius: 6px;
+    }
+
+    #brandTitle {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: color 0.16s ease;
     }
 
     .brand-mark {
@@ -165,7 +188,7 @@
 
     .grid {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr));
       gap: 16px;
     }
 
@@ -287,6 +310,10 @@
       align-items: start;
     }
 
+    .settings-layout > * {
+      min-width: 0;
+    }
+
     .table-panel,
     .config-panel,
     .editor-panel,
@@ -298,7 +325,7 @@
     }
 
     .table-panel {
-      overflow: hidden;
+      overflow-x: auto;
     }
 
     .config-panel {
@@ -452,16 +479,109 @@
     .hidden {
       display: none;
     }
+
+    @media (max-width: 900px) {
+      .topbar {
+        padding: 0 24px;
+      }
+
+      .wrap {
+        width: min(100% - 48px, 680px);
+      }
+
+      .settings-layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+
+      .editor-panel {
+        position: static;
+      }
+
+      table {
+        min-width: 660px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      .topbar {
+        height: 58px;
+        padding: 0 16px;
+      }
+
+      .brand {
+        gap: 10px;
+        font-size: 17px;
+      }
+
+      .brand-mark {
+        width: 30px;
+        height: 30px;
+      }
+
+      .icon-button {
+        width: 42px;
+        height: 42px;
+      }
+
+      .wrap {
+        width: auto;
+        margin: 16px 14px 40px;
+      }
+
+      .link-card {
+        min-height: 108px;
+        gap: 16px;
+        padding: 18px;
+      }
+
+      .link-title {
+        font-size: 17px;
+      }
+
+      .page-head {
+        align-items: flex-start;
+        margin-bottom: 16px;
+      }
+
+      h1 {
+        font-size: 23px;
+      }
+
+      .config-panel,
+      .editor-panel {
+        padding: 16px;
+      }
+
+      .config-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+      }
+
+      .config-grid .field {
+        margin-bottom: 14px;
+      }
+
+      .config-grid .field:last-child {
+        margin-bottom: 0;
+      }
+
+      .settings-layout {
+        gap: 16px;
+      }
+
+      .empty {
+        padding: 36px 22px;
+      }
+    }
   </style>
 </head>
 <body>
   <header class="topbar">
-    <div class="brand">
-      <div class="brand-mark" id="brandIcon">N</div>
-      <span id="brandTitle">导航</span>
-    </div>
+    <button class="brand" id="brandHomeButton" type="button" aria-label="返回首页" title="返回首页">
+      <span class="brand-mark" id="brandIcon">N</span>
+      <span id="brandTitle">导航页</span>
+    </button>
     <div class="nav-actions">
-      <button class="button hidden" id="homeButton" type="button">返回首页</button>
       <button class="icon-button" id="settingsButton" type="button" aria-label="配置" title="配置">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z" stroke="currentColor" stroke-width="2"/>
@@ -491,11 +611,11 @@
             <div class="config-grid">
               <div class="field">
                 <label for="appTitleInput">页面标题</label>
-                <input id="appTitleInput" type="text" autocomplete="off" placeholder="导航">
+                <input id="appTitleInput" type="text" autocomplete="off" placeholder="导航页">
               </div>
               <div class="field">
                 <label for="brandTitleInput">左上角标题</label>
-                <input id="brandTitleInput" type="text" autocomplete="off" placeholder="导航">
+                <input id="brandTitleInput" type="text" autocomplete="off" placeholder="导航页">
               </div>
               <div class="field">
                 <label for="brandIconInput">图标文字</label>
@@ -560,8 +680,8 @@
     const FAVORITES_KEY = "nav-favorites";
     const HOST_TOKEN_PATTERN = /\{\{host\}\}|\{\{hostname\}\}?|(^|:\/\/)hostname(?=[:/]|$)/gi;
     const DEFAULT_APP = {
-      pageTitle: "导航",
-      brandTitle: "导航",
+      pageTitle: "导航页",
+      brandTitle: "导航页",
       icon: "N"
     };
     const state = {
@@ -576,8 +696,8 @@
     const emptyState = document.querySelector("#emptyState");
     const brandIcon = document.querySelector("#brandIcon");
     const brandTitle = document.querySelector("#brandTitle");
+    const brandHomeButton = document.querySelector("#brandHomeButton");
     const settingsButton = document.querySelector("#settingsButton");
-    const homeButton = document.querySelector("#homeButton");
     const homePage = document.querySelector("#homePage");
     const settingsPage = document.querySelector("#settingsPage");
     const saveButton = document.querySelector("#saveButton");
@@ -915,7 +1035,6 @@
       const isSettings = location.hash === "#settings";
       homePage.classList.toggle("hidden", isSettings);
       settingsPage.classList.toggle("hidden", !isSettings);
-      homeButton.classList.toggle("hidden", !isSettings);
       settingsButton.classList.toggle("hidden", isSettings);
     }
 
@@ -1012,7 +1131,7 @@
     }
 
     settingsButton.addEventListener("click", showSettings);
-    homeButton.addEventListener("click", showHome);
+    brandHomeButton.addEventListener("click", showHome);
     saveButton.addEventListener("click", saveItems);
     appTitleInput.addEventListener("input", () => {
       collectAppConfig();
